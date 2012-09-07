@@ -1,27 +1,51 @@
 package ch.deathmar;
 
-import junit.framework.TestCase;
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
-public class CountYusukeTest extends TestCase {
-    public void testIsYusuke() throws Exception{
-        assertTrue(CountYusuke.isYusuke("yusuke"));
-        assertTrue(CountYusuke.isYusuke("Yusuke"));
-        assertTrue(CountYusuke.isYusuke("ゆうすけ"));
-        assertTrue(CountYusuke.isYusuke("ゆーすけ"));
-        assertTrue(CountYusuke.isYusuke("ユウスケ"));
-        assertTrue(CountYusuke.isYusuke(" 雄助"));
-        assertTrue(CountYusuke.isYusuke("裕介yusukey"));
-        assertTrue(CountYusuke.isYusuke("裕典"));
-        assertTrue(CountYusuke.isYusuke("優介"));
-        assertTrue(CountYusuke.isYusuke("遊助"));
-        assertFalse(CountYusuke.isYusuke("yu-suke"));
-        assertFalse(CountYusuke.isYusuke("yosuke"));
-        assertFalse(CountYusuke.isYusuke("yamamoto"));
+import java.util.ArrayList;
+
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
+
+@RunWith(Theories.class)
+public class CountYusukeTest {
+
+    @DataPoints
+    public static Fixture[] yusuke() {
+        String[] yusuke = { "yusuke", "Yusuke", "ゆうすけ", "ゆーすけ", "ユウスケ", " 雄助",
+                "裕介yusukey", "裕典", "優介", "遊助" };
+        return fixtures(yusuke, true);
     }
-    public void testCount() throws Exception{
-//        Twitter twitter = new TwitterFactory("/test").getInstance();
-//        assertTrue(1 == new CountYusuke().count(twitter).count);
+
+    @DataPoints
+    public static Fixture[] notYusuke() {
+        String[] notYusuke = { "yu-suke", "yosuke", "yamamoto" };
+        return fixtures(notYusuke, false);
+    }
+
+    @Theory
+    public void testIsYusuke(Fixture param) throws Exception {
+        assertThat(CountYusuke.isYusuke(param.name), is(param.isYusuke));
+    }
+
+    private static Fixture[] fixtures(String[] y, boolean isYusuke) {
+        ArrayList<Fixture> list = new ArrayList<Fixture>();
+        for (String name : y) {
+            list.add(new Fixture(name, isYusuke));
+        }
+        return list.toArray(new Fixture[list.size()]);
+    }
+
+    static class Fixture {
+        final String name;
+        final boolean isYusuke;
+
+        public Fixture(String name, boolean isYusuke) {
+            this.name = name;
+            this.isYusuke = isYusuke;
+        }
     }
 }
